@@ -18,7 +18,7 @@ sequelizeObject
     console.error("Unable to connect to the database:", err);
   });
 
-sequelizeObject.sync({ force: false })
+sequelizeObject.sync({ force: false})
 .then ( () => {
   console.log("Database synchronized with new changes successfully.");
 })

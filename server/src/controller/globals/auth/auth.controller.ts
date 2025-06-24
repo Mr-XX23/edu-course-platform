@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import User from '../../../database/models/user.models';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { envConfig } from '../../../../config/config'
 
-const registerUser = async ( req : Request ,  res : Response  ) => {
+export const registerUser = async ( req : Request ,  res : Response  ) => {
 
     // Check if the request body is empty
     if ( !req.body ) {
-        return res.status(400).json({
+        res.status(400).json({
             success: false,
             message: "Please provide user details in the request body",
         });
@@ -18,37 +20,38 @@ const registerUser = async ( req : Request ,  res : Response  ) => {
 
     // check if all required fields are provided
     if ( !username || !password || !email ) {
-        return res.status(400).json({
+        res.status(400).json({
             success : false,
             message : "All fields are required",
         })
-
         return;
     } 
 
-    await User.create({
-        username,
-        email,
-        password : bcrypt.hashSync(password, 10),
+    await User.create({ 
+        username: username,
+        email: email,
+        password: bcrypt.hashSync(password, 10),
     })
     .then( ( user ) => {
-        return res.status(201).json({
+        res.status(201).json({
             success: true,
             message: "User registered successfully",
-            user : user
+            user: user
         })
+        return;
     })
     .catch( ( error ) => {
-        return res.status(500).json({
+        res.status(500).json({
             success: false,
             message: "Error registering user",
             error: error.message
         })
+        return;
     });
 
 }
 
-const loginUser = async ( req: Request, res : Response ) {
+export const loginUser = async ( req: Request, res : Response ) => {
     const { email, password } = req.body
 
     if ( !email || !password ) {
@@ -65,21 +68,34 @@ const loginUser = async ( req: Request, res : Response ) {
     })
 
     if (data.length === 0) {
-        return res.status(404).json({
+        res.status(404).json({
             success: false,
             message: "Not Registred !"
         });
+        return;
     } else {
         const isPasswordMatch = bcrypt.compareSync(password, data[0].password)
+        
         if ( isPasswordMatch ) {
-
+            const token = jwt.sign(
+                {
+                    id: data[0].id
+                },
+                envConfig.jwtSecret as string,
+                {
+                    expiresIn: "30d"
+                }
+            )
+            res.json({
+                token : token,
+                message : "Login Successfull"
+            })
         } else {
             res.status(403).json({
                 message : "Invalid Credentails"
             })
         }
+        return;
     }
 
 }
-
-export { registerUser, loginUser};

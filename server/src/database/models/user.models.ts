@@ -1,11 +1,13 @@
 import { Table, Column, Model, DataType, PrimaryKey, Default, Min, Max } from "sequelize-typescript";
+import { UserCreationAttributes }  from "../modelsTypes/userTypes";
 
 @Table({
   tableName: "users",
   modelName: "User",
   timestamps: true,
 })
-class User extends Model<User> {
+
+class User extends Model<User, UserCreationAttributes> {
     
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -41,6 +43,12 @@ class User extends Model<User> {
     allowNull: false,
   })
   declare role: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare currentInstituteID: string | null;
 }
 
 export default User;
