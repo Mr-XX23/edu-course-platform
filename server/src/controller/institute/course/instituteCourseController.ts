@@ -3,7 +3,9 @@ import { IExtendedRequest } from '../../../middleware/authType';
 import sequelizeObject from '../../../database/connection';
 
 const AddCourse = async( req: IExtendedRequest, res: Response, next: NextFunction) => {
-    const { courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail } = req.body;
+    const { courseName, courseDescription, courseDuration, coursePrice, courseLevel } = req.body;
+    const courseThumbnail = req.file ? req.file.path : null;
+    const instituteID = req.user?.currentInstituteID;
 
     try {
         // Validate the request body
@@ -16,20 +18,30 @@ const AddCourse = async( req: IExtendedRequest, res: Response, next: NextFunctio
     }
 
     const returnObject = await sequelizeObject.query(
-        `INSERT INTO course_${req.instituteID} (id, courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail)
-        VALUES(UUID(), ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO course_${instituteID} (id, courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail)
+        VALUES(gen_random_uuid(), ?, ?, ?, ?, ?, ?)`,
         {
-            replacements: [courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail, courseThumbnail || ""],
+            replacements: [courseName, courseDescription, courseDuration, coursePrice, courseLevel, courseThumbnail, courseThumbnail],
         }
     )
 
-    console.log("Course created successfully:", returnObject);
-    res.status(201).json({
-        success: true,
-        message: "Course created successfully.",
-        data: returnObject
-    });
-    return;
+    if (
+        returnObject &&
+        typeof returnObject[1] === 'number' &&
+        returnObject[1] > 0
+    ) {
+        res.status(201).json({
+            success: true,
+            message: "Course created successfully.",
+        });
+        return;
+    } else {
+        res.status(400).json({
+            success: false,
+            message: "Failed to create course.",
+        });
+        return;
+    }
 
     } catch (error) {
         console.error("Error creating course:", error);
@@ -43,6 +55,7 @@ const AddCourse = async( req: IExtendedRequest, res: Response, next: NextFunctio
 
 const deleteCourse = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
     const { courseId } = req.params;
+    const instituteID = req.user?.currentInstituteID;
 
     try {
         // Validate the courseId
@@ -55,7 +68,7 @@ const deleteCourse = async (req: IExtendedRequest, res: Response, next: NextFunc
         }
         // Check if the course exists
         const courseExists = await sequelizeObject.query(
-            `SELECT * FROM course_${req.instituteID} WHERE id = ?`,
+            `SELECT * FROM course_${instituteID} WHERE id = ?`,
             {
                 replacements: [courseId],
                 
@@ -95,10 +108,11 @@ const deleteCourse = async (req: IExtendedRequest, res: Response, next: NextFunc
 }
 
 const getAllCourses = async ( req: IExtendedRequest, res: Response, next: NextFunction) => {
+    const instituteID = req.user?.currentInstituteID;
     try {
 
         const courses = await sequelizeObject.query(
-            `SELECT * FROM course_${req.instituteID}`
+            `SELECT * FROM course_${instituteID}`
         );
         
         res.status(200).json({
@@ -121,6 +135,7 @@ const getAllCourses = async ( req: IExtendedRequest, res: Response, next: NextFu
 const getCourseById = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
 
     const { courseId } = req.params;
+    const instituteID = req.user?.currentInstituteID;
 
     try {
         // Validate the courseId
@@ -134,7 +149,7 @@ const getCourseById = async (req: IExtendedRequest, res: Response, next: NextFun
 
         // Check if the course exists
         const course = await sequelizeObject.query(
-            `SELECT * FROM course_${req.instituteID} WHERE id = ?`,
+            `SELECT * FROM course_${instituteID} WHERE id = ?`,
             {
                 replacements: [courseId],
             }
