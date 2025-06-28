@@ -65,8 +65,6 @@ const isLoggedIn = (req: IExtendedRequest, res: Response, next: NextFunction) =>
         return;
     }
 
-    
-
 }
 
 export default isLoggedIn;

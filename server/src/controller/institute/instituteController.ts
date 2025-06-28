@@ -6,7 +6,6 @@ import User from "../../database/models/user.models";
 
 const createInstitute = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
     //console.log("Creating institute with body:", req.user);
-
     try {
         const {
             instituteName,
@@ -109,7 +108,6 @@ const createInstitute = async (req: IExtendedRequest, res: Response, next: NextF
         });
         return;
     }
-
 };
 
 const intituteCreatedByUserHistory = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
@@ -163,6 +161,9 @@ const createTeacher = async (req: IExtendedRequest, res: Response, next: NextFun
                 teacherEmail VARCHAR(255) NOT NULL UNIQUE,
                 teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
                 teacherAddress VARCHAR(255) NOT NULL,
+                teacherExpertise VARCHAR(255) NOT NULL,
+                teacherSalary VARCHAR(255) NOT NULL,
+                joiningDate DATE NOT NULL,
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`)
@@ -187,10 +188,12 @@ const createdStudent = async (req: IExtendedRequest, res: Response, next: NextFu
                 studentEmail VARCHAR(255) NOT NULL UNIQUE,
                 studentPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
                 studentAddress VARCHAR(255) NOT NULL,
+                enrollmentDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                studentImage VARCHAR(255),
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`)
-
+        next();
     } catch (error) {
         console.error("Error creating teacher table:", error);
         res.status(500).json({
@@ -201,9 +204,19 @@ const createdStudent = async (req: IExtendedRequest, res: Response, next: NextFu
 }
 
 
-const createdCourse = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
+const createCourse = async (req: IExtendedRequest, res: Response, next: NextFunction) => {
 
     try {
+        await sequelizeObject.query(`
+            DO $$
+            BEGIN
+                IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'courselevel_enum') THEN
+                    CREATE TYPE courselevel_enum AS ENUM ('beginner', 'intermediate', 'advanced');
+                END IF;
+            END$$;
+        `);
+
+
         await sequelizeObject.query(`
             CREATE TABLE IF NOT EXISTS course_${req.instituteID} (
                 id CHAR(36) NOT NULL PRIMARY KEY,
@@ -211,6 +224,8 @@ const createdCourse = async (req: IExtendedRequest, res: Response, next: NextFun
                 courseDescription TEXT NOT NULL,
                 courseDuration VARCHAR(255) NOT NULL,
                 coursePrice VARCHAR(255) NOT NULL,
+                courselevel courselevel_enum NOT NULL,
+                courseThumbnail VARCHAR(255),
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
@@ -223,5 +238,6 @@ const createdCourse = async (req: IExtendedRequest, res: Response, next: NextFun
         return;
     }
 }
-export { createInstitute, intituteCreatedByUserHistory, createTeacher, createdStudent, createdCourse };
+
+export { createInstitute, intituteCreatedByUserHistory, createTeacher, createdStudent, createCourse };
 
