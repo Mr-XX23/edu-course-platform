@@ -153,6 +153,45 @@ const intituteCreatedByUserHistory = async (
   }
 };
 
+const createCategory = async (
+  req: IExtendedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await sequelizeObject.query(`
+            CREATE TABLE IF NOT EXISTS category_${req.instituteID} (
+                id CHAR(36) NOT NULL PRIMARY KEY,
+                categoryName VARCHAR(255) NOT NULL,
+                categoryDescription TEXT,
+                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`);
+
+    categoryData.forEach( async (category) => {
+        await sequelizeObject.query(`
+            INSERT INTO category_${req.instituteID} (id, categoryName, categoryDescription)
+            VALUES (gen_random_uuid(), ? , ?)
+        `, {
+            replacements: [category.categoryName, category.CategoryDescription]
+        });
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Institute Created",
+      instituteID: req.instituteID,
+    });
+    next();
+  } catch (error) {
+    console.error("Error creating category table:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+    return;
+  }
+};
+
 const createTeacher = async (
   req: IExtendedRequest,
   res: Response,
@@ -234,50 +273,12 @@ const createCourse = async (
                 coursePrice VARCHAR(255) NOT NULL,
                 courselevel courselevel_enum NOT NULL,
                 courseThumbnail VARCHAR(255),
+                categoryId CHAR(36) NOT NULL REFERENCES category_${req.instituteID}(id),
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
-    next();
   } catch (error) {
     console.error("Error creating teacher table:", error);
-    res.status(500).json({
-      message: "Internal Server Error",
-    });
-    return;
-  }
-};
-
-const createCategory = async (
-  req: IExtendedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    await sequelizeObject.query(`
-            CREATE TABLE IF NOT EXISTS category_${req.instituteID} (
-                id CHAR(36) NOT NULL PRIMARY KEY,
-                categoryName VARCHAR(255) NOT NULL,
-                categoryDescription TEXT,
-                createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )`);
-
-    categoryData.forEach( async (category) => {
-        await sequelizeObject.query(`
-            INSERT INTO category_${req.instituteID} (id, categoryName, categoryDescription)
-            VALUES (gen_random_uuid(), ? , ?)
-        `, {
-            replacements: [category.categoryName, category.CategoryDescription]
-        });
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Institute Created",
-      instituteID: req.instituteID,
-    });
-  } catch (error) {
-    console.error("Error creating category table:", error);
     res.status(500).json({
       message: "Internal Server Error",
     });
@@ -288,8 +289,8 @@ const createCategory = async (
 export {
   createInstitute,
   intituteCreatedByUserHistory,
+  createCategory,
   createTeacher,
   createdStudent,
   createCourse,
-  createCategory,
 };

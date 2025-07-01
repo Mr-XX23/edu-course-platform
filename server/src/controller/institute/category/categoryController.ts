@@ -1,12 +1,13 @@
 import { Response } from "express";
 import { IExtendedRequest } from "../../../middleware/authType";
 import sequelizeObject from "../../../database/connection";
+import { QueryTypes } from "sequelize";
 
 const createCategory = async (req: IExtendedRequest, res: Response) => {
   // Extracting the institute ID from the request
   const instituteID = req.user?.currentInstituteID;
 
-    // Check if instituteID is provided
+  // Check if instituteID is provided
   if (!instituteID) {
     res.status(400).json({
       success: false,
@@ -33,6 +34,7 @@ const createCategory = async (req: IExtendedRequest, res: Response) => {
         VALUES (gen_random_uuid(), ?, ?)
       `,
       {
+        type: QueryTypes.INSERT,
         replacements: [categoryName, categoryDescription],
       }
     );
@@ -49,7 +51,6 @@ const createCategory = async (req: IExtendedRequest, res: Response) => {
       });
       return;
     }
-
   } catch (error) {
     console.error("Error creating category:", error);
     res.status(500).json({
@@ -61,81 +62,85 @@ const createCategory = async (req: IExtendedRequest, res: Response) => {
 };
 
 const getCategories = async (req: IExtendedRequest, res: Response) => {
-    
-    const instituteID = req.user?.currentInstituteID;
+  const instituteID = req.user?.currentInstituteID;
 
-    // Check if instituteID is provided
-    if (!instituteID) {
-        res.status(400).json({
-            success: false,
-            message: "Institute ID is required.",
-        });
-        return;
+  // Check if instituteID is provided
+  if (!instituteID) {
+    res.status(400).json({
+      success: false,
+      message: "Institute ID is required.",
+    });
+    return;
+  }
+
+  try {
+    const categories = await sequelizeObject.query(
+      `SELECT * FROM category_${instituteID}`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (categories.length > 0) {
+      res.status(200).json({
+        success: true,
+        categories: categories,
+      });
+      return;
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "No categories found.",
+      });
+      return;
     }
-
-    try {
-
-        const categories = await sequelizeObject.query(
-            `SELECT * FROM category_${instituteID}`,
-        );
-
-        if (categories.length > 0) {
-            res.status(200).json({
-                success: true,
-                categories: categories,
-            });
-            return;
-        } else {
-            res.status(404).json({
-                success: false,
-                message: "No categories found.",
-            });
-            return;
-        }
-
-    } catch (error) {
-        console.error("Error fetching categories:", error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error.",
-        });
-        return;
-    }
-}
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+    return;
+  }
+};
 
 const deleteCategory = async (req: IExtendedRequest, res: Response) => {
-    const instituteID = req.user?.currentInstituteID;
-    const { categoryId } = req.params;
+  const instituteID = req.user?.currentInstituteID;
+  const { categoryId } = req.params;
 
-    // Check if instituteID is provided
-    if (!instituteID) {
-        res.status(400).json({
-            success: false,
-            message: "Institute ID is required.",
-        });
-        return;
-    }
-
-    const returnObject = await sequelizeObject.query(`
-        DELETE FROM category_${instituteID} WHERE id = ?
-    `, {
-        replacements: [categoryId],
+  try {
+  // Check if instituteID is provided
+  if (!instituteID) {
+    res.status(400).json({
+      success: false,
+      message: "Institute ID is required.",
     });
+    return;
+  }
 
-    if (returnObject && typeof returnObject[1] === "number" && returnObject[1] > 0) {
-        res.status(200).json({
-            success: true,
-            message: "Category deleted successfully.",
-        });
-        return;
-    } else {
-        res.status(404).json({
-            success: false,
-            message: "Category not found.",
-        });
-        return;
+  const returnObject = await sequelizeObject.query(
+    `DELETE FROM category_${instituteID} WHERE id = ?`,
+    {
+      type: QueryTypes.DELETE,
+      replacements: [categoryId],
     }
-}
+  );
 
+
+    res.status(200).json({
+      success: true,
+      message: "Category deleted successfully.",
+    });
+    return;
+
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: "Category not found.",
+    });
+    return;
+  }
+  
+};
 
 export { createCategory, getCategories, deleteCategory };
