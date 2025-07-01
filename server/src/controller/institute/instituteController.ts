@@ -204,9 +204,11 @@ const createTeacher = async (
                 teacherName VARCHAR(255) NOT NULL,
                 teacherEmail VARCHAR(255) NOT NULL UNIQUE,
                 teacherPhoneNumber VARCHAR(255) NOT NULL UNIQUE,
+                teacherPassword VARCHAR(255) NOT NULL,
                 teacherAddress VARCHAR(255) NOT NULL,
                 teacherExpertise VARCHAR(255) NOT NULL,
                 teacherSalary VARCHAR(255) NOT NULL,
+                teacherImage VARCHAR(255),
                 joiningDate DATE NOT NULL,
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -274,6 +276,7 @@ const createCourse = async (
                 courselevel courselevel_enum NOT NULL,
                 courseThumbnail VARCHAR(255),
                 categoryId CHAR(36) NOT NULL REFERENCES category_${req.instituteID}(id),
+                teacherId CHAR(36) REFERENCES teacher_${req.instituteID}(id),
                 createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);

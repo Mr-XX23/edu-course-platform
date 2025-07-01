@@ -3,14 +3,14 @@ import { IExtendedRequest } from '../../../middleware/authType';
 import sequelizeObject from '../../../database/connection';
 import { QueryTypes } from 'sequelize';
 
-const AddCourse = async( req: IExtendedRequest, res: Response, next: NextFunction) => {
+const addCourse = async( req: IExtendedRequest, res: Response, next: NextFunction) => {
     const { courseName, courseDescription, courseDuration, coursePrice, courseLevel, categoryId } = req.body;
     const courseThumbnail = req.file ? req.file.path : null;
     const instituteID = req.user?.currentInstituteID;
 
     try {
         // Validate the request body
-    if (!courseName || !courseDescription || !courseDuration || !coursePrice || !courseLevel || !categoryId) {
+    if (!courseName || !courseDescription || !courseDuration || !coursePrice || !courseLevel || !categoryId || !courseThumbnail) {
         res.status(400).json({
             success: false,
             message: "All fields are required."
@@ -184,4 +184,4 @@ const getCourseById = async (req: IExtendedRequest, res: Response, next: NextFun
     }
 }
 
-export { AddCourse, deleteCourse, getAllCourses, getCourseById };
+export { addCourse, deleteCourse, getAllCourses, getCourseById };
