@@ -3,6 +3,7 @@ import { IExtendedRequest } from "../../../middleware/authType";
 import sequelizeObject from "../../../database/connection";
 import { QueryTypes } from "sequelize";
 import generateRandomPasswordGenerator from "../../../services/generateRandomPasswordGenerator";
+import sendMail from "../../../services/sendMail";
 
 const addTeacher = async (
     req: IExtendedRequest,
@@ -75,6 +76,13 @@ const addTeacher = async (
                     replacements: [teacherId[0].id, courseId],
                 }
             );
+
+            await sendMail({
+                to: teacherEmail,
+                subject: "Welcome to the Institute",
+                text: `Hello ${teacherName},\n\nYour account has been created successfully.\nEmail: ${teacherEmail}\nPassword: ${password.plainVersion}\nInstitute Number: ${req.user?.currentInstituteID}\n\nBest,\nInstitute Team`
+            });
+
         }
         res.status(201).json({
             success: true,

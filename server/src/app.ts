@@ -5,20 +5,28 @@ import instituteCourseRoute from './routes/institute/course/instituteCourseRoute
 import instituteStudentRouter from './routes/institute/student/instituteStudentRoute';
 import categoryRouter from './routes/institute/category/categoryRoute';
 import instituteTeacherRouter from './routes/institute/teacher/instituteTeacherRoute';
+import teacherRoute from './routes/teacher/teacherRoute';
 
 const app = express();
 app.use(express.json());
 
-app.use("/api/v1/auth", authRoute);
-app.use("/api/v1/institute", instituteRouter);
-app.use("/api/v1/institute/course", instituteCourseRoute);
-app.use("/api/v1/institute/student", instituteStudentRouter);
-app.use("/api/v1/institute/category", categoryRouter);
-app.use("/api/v1/institute/teacher", instituteTeacherRouter);
+// Global authentication routes
 app.use("/", (req, res) => {
   res.status(200).json({
     message: "Welcome to the Creator API",
   });
 });
+app.use("/api/v1/auth", authRoute);
+
+// institute routes
+app.use("/api/v1/institute", instituteRouter);
+app.use("/api/v1/institute/course", instituteCourseRoute);
+app.use("/api/v1/institute/student", instituteStudentRouter);
+app.use("/api/v1/institute/category", categoryRouter);
+app.use("/api/v1/institute/teacher", instituteTeacherRouter);
+
+// Teacher routes
+app.use("/api/v1/teacher", teacherRoute);
+
 
 export default app;

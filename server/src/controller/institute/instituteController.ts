@@ -168,13 +168,16 @@ const createCategory = async (
                 updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )`);
 
-    categoryData.forEach( async (category) => {
-        await sequelizeObject.query(`
+    categoryData.forEach(async (category) => {
+      await sequelizeObject.query(
+        `
             INSERT INTO category_${req.instituteID} (id, categoryName, categoryDescription)
             VALUES (gen_random_uuid(), ? , ?)
-        `, {
-            replacements: [category.categoryName, category.CategoryDescription]
-        });
+        `,
+        {
+          replacements: [category.categoryName, category.CategoryDescription],
+        }
+      );
     });
 
     res.status(201).json({
