@@ -1,18 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userSlice from "./userSlice";
-import studentReducer from "./studentSlice";
-import teacherReducer from "./teacherSlice";
+import authSlice from "./auth/authSlice";
+import teacherSlice from "./teacher/teacherSlice";
+import instituteSlice from "./institute/instituteSlice";
+
 
 const store = configureStore({
     reducer: {
-        userSlice,
-        studentReducer,
-        teacherReducer
+        auth : authSlice,
+        teacher : teacherSlice,
+        institute : instituteSlice
     }
 })
 
 export default store;
 
-// dispatch type for useDispatch hook
+// // dispatch type for useDispatch hook
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
