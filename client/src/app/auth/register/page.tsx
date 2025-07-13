@@ -2,21 +2,31 @@
 
 import { useState, ChangeEvent, FormEvent } from "react"
 import { motion, easeOut } from "framer-motion"
-import { Eye, EyeOff, Mail, Lock, User, BookOpen, ArrowRight } from "lucide-react"
+import { Eye, EyeOff, Mail, User, Lock, BookOpen, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import Link from "next/link"
+import { registerUser } from "@/lib/store/auth/authSlice"
+import { IRegisterData } from "@/lib/store/auth/authTypes"
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
+import { Status } from "@/lib/types/type"
 
 export default function RegisterPage() {
-  const [ formData, setFormData ] = useState({
+
+  const [ formData, setFormData ] = useState<IRegisterData>({
     username : "",
     email: "",
     password: ""
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const dispatch = useAppDispatch();
+
+  const {status, user} = useAppSelector( (store) => store.auth)
+
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -38,16 +48,23 @@ export default function RegisterPage() {
 
   const handleDataChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name] : value
-    })
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   }
 
   const handleRegisterSubmit = ( e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // api call to register user
+    // Api call to register user
     console.log("Registering user:", formData);
+    dispatch(registerUser(formData));
+    if (status === Status.SUCCESS) {
+      alert("Registration successful! Welcome, " + user.username);
+    } else if ( status === Status.ERROR ) {
+      alert("Registration failed. Please try again.");
+    }
+
   } 
 
   return (
@@ -190,7 +207,7 @@ export default function RegisterPage() {
               </motion.div>
 
               <motion.div variants={inputVariants} custom={5}>
-                <Button className="w-full bg-[#714af5] hover:bg-[#5a3bd4] text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] group">
+                <Button type="submit" className="w-full bg-[#714af5] hover:bg-[#5a3bd4] text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] group">
                   Create Your Account
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -198,13 +215,21 @@ export default function RegisterPage() {
             </motion.form>
 
             {/* Social login */}
-            <motion.div className="mt-8" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+            {/* Social login */}
+            <motion.div
+              className="mt-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-gray-800 text-gray-400">Or sign up with</span>
+                  <span className="px-2 bg-gray-800 text-gray-400">
+                    Or continue with
+                  </span>
                 </div>
               </div>
 
@@ -237,10 +262,57 @@ export default function RegisterPage() {
                   variant="outline"
                   className="bg-gray-700/50 border-gray-600 text-white hover:bg-gray-600/50 transition-all duration-300"
                 >
-                  <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="h-5 w-5 mr-2"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                   Facebook
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-gray-700/50 border-gray-600 text-white hover:bg-gray-600/50 transition-all duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-github-icon lucide-github"
+                  >
+                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                    <path d="M9 18c-4.51 2-5-2-7-2" />
+                  </svg>
+                  GitHub
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-gray-700/50 border-gray-600 text-white hover:bg-gray-600/50 transition-all duration-300"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-linkedin-icon lucide-linkedin"
+                  >
+                    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                    <rect width="4" height="12" x="2" y="9" />
+                    <circle cx="4" cy="4" r="2" />
+                  </svg>
+                  Linkedin
                 </Button>
               </div>
             </motion.div>
