@@ -1,32 +1,40 @@
-"use client"
+"use client";
 
-import { useState, ChangeEvent, FormEvent } from "react"
-import { motion, easeOut } from "framer-motion"
-import { Eye, EyeOff, Mail, User, Lock, BookOpen, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
-import { registerUser } from "@/lib/store/auth/authSlice"
-import { IRegisterData } from "@/lib/store/auth/authTypes"
-import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
-import { Status } from "@/lib/types/type"
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion, easeOut } from "framer-motion";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Lock,
+  BookOpen,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { registerUser } from "@/lib/store/auth/authSlice";
+import { IRegisterData } from "@/lib/store/auth/authTypes";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { Status } from "@/lib/types/type";
 
 export default function RegisterPage() {
-
-  const [ formData, setFormData ] = useState<IRegisterData>({
-    username : "",
+  const router = useRouter();
+  const [formData, setFormData] = useState<IRegisterData>({
+    username: "",
     email: "",
-    password: ""
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const dispatch = useAppDispatch();
 
-  const {status, user} = useAppSelector( (store) => store.auth)
-
+  const { user, status } = useAppSelector((store) => store.auth);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -35,7 +43,7 @@ export default function RegisterPage() {
       y: 0,
       transition: { duration: 0.6, ease: easeOut },
     },
-  }
+  };
 
   const inputVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -44,28 +52,29 @@ export default function RegisterPage() {
       y: 0,
       transition: { delay: i * 0.1, duration: 0.3 },
     }),
-  }
+  };
 
   const handleDataChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
 
-  const handleRegisterSubmit = ( e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Api call to register user
-    console.log("Registering user:", formData);
-    dispatch(registerUser(formData));
+  useEffect(() => {
     if (status === Status.SUCCESS) {
-      alert("Registration successful! Welcome, " + user.username);
-    } else if ( status === Status.ERROR ) {
+      router.push("/auth/login");
+    } else if (status === Status.ERROR) {
       alert("Registration failed. Please try again.");
     }
+  }, [status, user]);
 
-  } 
+  const handleRegisterSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Api call to register user
+    dispatch(registerUser(formData));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
@@ -94,13 +103,24 @@ export default function RegisterPage() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Join EduCourse</h1>
-          <p className="text-gray-400">Start your learning adventure today and unlock your potential</p>
+          <p className="text-gray-400">
+            Start your learning adventure today and unlock your potential
+          </p>
         </motion.div>
 
         <Card className="bg-gray-800/50 backdrop-blur-lg border-gray-700/50 shadow-2xl">
           <CardContent className="p-8">
-            <motion.form onSubmit={handleRegisterSubmit} initial="hidden" animate="visible" className="space-y-6">
-              <motion.div variants={inputVariants} custom={0} className="space-y-2">
+            <motion.form
+              onSubmit={handleRegisterSubmit}
+              initial="hidden"
+              animate="visible"
+              className="space-y-6"
+            >
+              <motion.div
+                variants={inputVariants}
+                custom={0}
+                className="space-y-2"
+              >
                 <Label htmlFor="fullName" className="text-gray-300">
                   Full Name
                 </Label>
@@ -117,7 +137,11 @@ export default function RegisterPage() {
                 </div>
               </motion.div>
 
-              <motion.div variants={inputVariants} custom={1} className="space-y-2">
+              <motion.div
+                variants={inputVariants}
+                custom={1}
+                className="space-y-2"
+              >
                 <Label htmlFor="email" className="text-gray-300">
                   Email Address
                 </Label>
@@ -134,7 +158,11 @@ export default function RegisterPage() {
                 </div>
               </motion.div>
 
-              <motion.div variants={inputVariants} custom={2} className="space-y-2">
+              <motion.div
+                variants={inputVariants}
+                custom={2}
+                className="space-y-2"
+              >
                 <Label htmlFor="password" className="text-gray-300">
                   Password
                 </Label>
@@ -153,12 +181,20 @@ export default function RegisterPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </motion.div>
 
-              <motion.div variants={inputVariants} custom={3} className="space-y-2">
+              <motion.div
+                variants={inputVariants}
+                custom={3}
+                className="space-y-2"
+              >
                 <Label htmlFor="confirmPassword" className="text-gray-300">
                   Confirm Password
                 </Label>
@@ -175,12 +211,20 @@ export default function RegisterPage() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </motion.div>
 
-              <motion.div variants={inputVariants} custom={4} className="space-y-4">
+              <motion.div
+                variants={inputVariants}
+                custom={4}
+                className="space-y-4"
+              >
                 <label className="flex items-start space-x-2 text-sm text-gray-300">
                   <input
                     type="checkbox"
@@ -188,11 +232,17 @@ export default function RegisterPage() {
                   />
                   <span>
                     I agree to the{" "}
-                    <button type="button" className="text-[#714af5] hover:text-[#5a3bd4] underline">
+                    <button
+                      type="button"
+                      className="text-[#714af5] hover:text-[#5a3bd4] underline"
+                    >
                       Terms of Service
                     </button>{" "}
                     and{" "}
-                    <button type="button" className="text-[#714af5] hover:text-[#5a3bd4] underline">
+                    <button
+                      type="button"
+                      className="text-[#714af5] hover:text-[#5a3bd4] underline"
+                    >
                       Privacy Policy
                     </button>
                   </span>
@@ -202,12 +252,18 @@ export default function RegisterPage() {
                     type="checkbox"
                     className="rounded border-gray-600 bg-gray-700 text-[#714af5] focus:ring-[#714af5]"
                   />
-                  <span>Subscribe to our newsletter for course updates and learning tips</span>
+                  <span>
+                    Subscribe to our newsletter for course updates and learning
+                    tips
+                  </span>
                 </label>
               </motion.div>
 
               <motion.div variants={inputVariants} custom={5}>
-                <Button type="submit" className="w-full bg-[#714af5] hover:bg-[#5a3bd4] text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] group">
+                <Button
+                  type="submit"
+                  className="w-full bg-[#714af5] hover:bg-[#5a3bd4] text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] group"
+                >
                   Create Your Account
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -327,11 +383,14 @@ export default function RegisterPage() {
           transition={{ delay: 0.7 }}
         >
           Already have an account?{" "}
-          <Link href="/auth/login" className="text-[#714af5] hover:text-[#5a3bd4] font-medium transition-colors">
+          <Link
+            href="/auth/login"
+            className="text-[#714af5] hover:text-[#5a3bd4] font-medium transition-colors"
+          >
             Sign in here
           </Link>
         </motion.p>
       </motion.div>
     </div>
-  )
+  );
 }

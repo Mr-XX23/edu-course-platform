@@ -3,6 +3,7 @@ import { config } from 'dotenv'
 config();
 
 export const envConfig = {
+
     portNumber : process.env.PORT || 3000,
     databaseUrl: process.env.DATABASE_CONNECTION_STRING,
     jwtSecret : process.env.JWT_SECRET,
@@ -14,7 +15,8 @@ export const envConfig = {
     email: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
-    }
-
+    },
+    clientUrl : process.env.CORS_CLIENT_ORIGIN,
+    
 }
 

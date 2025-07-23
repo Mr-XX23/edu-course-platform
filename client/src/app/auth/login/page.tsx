@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, easeOut } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,19 +8,37 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/store/auth/authSlice";
 import { Status } from "@/lib/types/type";
 import { useAppSelector } from "@/lib/store/hooks";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { status, user, session } = useAppSelector((store) => store.auth);
+
+  // Watch for authentication status changes
+    useEffect(() => {
+    if (session?.loggedIn) {
+      router.push("/");
+    }
+  }, [session?.loggedIn, router]);
+
+  // Redirect if already logged in
+    useEffect(() => {
+    if (status === Status.SUCCESS && session?.loggedIn) {
+      router.push("/");
+    } else if (status === Status.ERROR) {
+      alert("Login failed. Please check your credentials and try again.");
+    }
+  }, [status, session?.loggedIn, router]);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
   const [showPassword, setShowPassword] = useState(false);
-
-  const { status, user } = useAppSelector((store) => store.auth);
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -59,6 +77,8 @@ export default function LoginPage() {
       alert("Login failed. Please check your credentials and try again.");
     }
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">

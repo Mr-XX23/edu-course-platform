@@ -11,7 +11,10 @@ const initalState: IInitalState = {
         email: "",
         password: "",
     },
-    status: Status.LOADING,
+    status: Status.IDLE,
+    session: {
+        loggedIn: false,
+    }
 }
 
 const authSlice = createSlice({
@@ -23,21 +26,26 @@ const authSlice = createSlice({
         },
         setStatus : ( state: IInitalState, action: PayloadAction<Status> ) => {
             state.status = action.payload;
+        },
+        setSession : ( state : IInitalState, action: PayloadAction<boolean> ) => {
+            state.session.loggedIn = action.payload;
         }
     } 
 })
 
-const { setUser, setStatus } = authSlice.actions;
+const { setUser, setStatus, setSession } = authSlice.actions;
 export default authSlice.reducer;
-export { setUser, setStatus };
+export { setUser, setStatus, setSession };
 
 // Function to register user
 function registerUser(formData: IRegisterData) {
     return async (dispatch: AppDispatch) => {
+        dispatch(setStatus(Status.LOADING));
         try {
             const response = await api.post("/auth/register", formData)
+            //console.log("Response from register:", response.data.user);
             if (response.status === 201) {
-                dispatch(setUser(response.data))
+                dispatch(setUser(response.data.user))
                 dispatch(setStatus(Status.SUCCESS))
             } else {
                 dispatch(setStatus(Status.ERROR));

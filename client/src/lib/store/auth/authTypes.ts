@@ -12,4 +12,7 @@ export interface IRegisterData extends ILoginFormData {
 export interface IInitalState {
     user : IRegisterData;
     status: Status;
+    session: {
+        loggedIn: boolean;
+    }
 }

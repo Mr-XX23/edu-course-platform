@@ -6,16 +6,31 @@ import instituteStudentRouter from './routes/institute/student/instituteStudentR
 import categoryRouter from './routes/institute/category/categoryRoute';
 import instituteTeacherRouter from './routes/institute/teacher/instituteTeacherRoute';
 import teacherRoute from './routes/teacher/teacherRoute';
+import cors from 'cors';
+import { envConfig } from '../config/config';
+import cookieParser from "cookie-parser";
 
 const app = express();
+
+// Middleware to set security headers
+app.disable('x-powered-by');
+
+// Middleware to handle CORS
+app.use(cors({
+  origin: envConfig.clientUrl,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+}));
+
+// Middleware to parse JSON bodies
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Global authentication routes
-app.use("/", (req, res) => {
-  res.status(200).json({
-    message: "Welcome to the Creator API",
-  });
-});
 app.use("/api/v1/auth", authRoute);
 
 // institute routes
@@ -27,6 +42,5 @@ app.use("/api/v1/institute/teacher", instituteTeacherRouter);
 
 // Teacher routes
 app.use("/api/v1/teacher", teacherRoute);
-
 
 export default app;

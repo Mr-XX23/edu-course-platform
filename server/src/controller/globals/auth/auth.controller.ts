@@ -33,11 +33,22 @@ export const registerUser = async (req: Request, res: Response) => {
     password: bcrypt.hashSync(password, 10),
   })
     .then((user) => {
-      res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: user,
-      });
+      const token = generateJwtToken({
+        id : user.id
+      })
+      const { id, username, email } = user;
+      if ( token.length > 0 ) {
+        res.status(201).json({
+          success: true,
+          message: "User registered successfully",
+          token : token,
+          user: {
+            id,
+            username,
+            email
+          },
+        });
+      }
       return;
     })
     .catch((error) => {
