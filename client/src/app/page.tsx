@@ -4,13 +4,29 @@ import Link from "next/link";
 import { BookOpen, ArrowRight, Users, Award, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-// import SubmissionPopup from "@/components/submissionPopup"
 import { useAppSelector } from "@/lib/store/hooks";
+import { useEffect } from "react";
+import api from "@/lib/https";
 
 
 export default function Home() {
   
   const { user } = useAppSelector((store) => store.auth);
+
+  useEffect( () => {
+    try {
+      const response = api.get("/auth/getAllUser",{
+        withCredentials: true
+      });
+      console.log("User data fetched successfully:", response);
+    } catch (error) { 
+      if (error instanceof Error) {
+        console.error("Error fetching user data:", error.message);
+      } else {
+        console.error("Unexpected error:", error);
+      }
+    }
+  },[user]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">

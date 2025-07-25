@@ -10,7 +10,7 @@ const isLoggedIn = (req: IExtendedRequest, res: Response, next: NextFunction) =>
 
     try {
         //const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
-         const token = req.cookies.authToken;
+         const token = req.cookies.sys_data;
 
         // If the token is not provided, return an error response
         if (!token) {

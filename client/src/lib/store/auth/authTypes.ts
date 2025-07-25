@@ -9,7 +9,6 @@ export interface IFormData {
 export interface ILoginFormData {
     id: string;
     username: string;
-    token: string;
 }
 
 export interface IRegisterData extends ILoginFormData {

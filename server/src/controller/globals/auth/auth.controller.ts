@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../../database/models/user.models";
 import bcrypt from "bcrypt";
-import { envConfig } from "../../../../config/config";
 import generateJwtToken from "../../../services/generateJwtToken";
 
 export const registerUser = async (req: Request, res: Response) => {
@@ -123,7 +122,7 @@ export const loginUser = async (req: Request, res: Response) => {
 export const logoutUser = async (req: Request, res: Response) => {
   try {
     // Clear the auth cookie
-    res.clearCookie('authToken', {
+    res.clearCookie('sys_data', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (status === Status.SUCCESS) {
-      router.push("/auth/login");
+      router.push("/");
     } else if (status === Status.ERROR) {
       alert("Registration failed. Please try again.");
     }

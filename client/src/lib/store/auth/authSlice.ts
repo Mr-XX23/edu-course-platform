@@ -9,7 +9,6 @@ const initalState: IInitalState = {
     user: {
         id : "",
         username: "",
-        token: "",
         email: ""
     },
     status: Status.IDLE,
@@ -49,7 +48,6 @@ function registerUser(formData: IFormData) {
                 dispatch(setUser({
                     id: response.data.user.id,
                     username: response.data.user.username,
-                    token: response.data.token,
                     email: response.data.user.email,
                 }))
                 dispatch(setStatus(Status.SUCCESS))
