@@ -1,15 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IInitalState, ILoginFormData } from "./authTypes";
+import { IInitalState,IFormData, IRegisterData } from "./authTypes";
 import { Status } from "@/lib/types/type";
 import api from "@/lib/https";
-import { IRegisterData } from "./authTypes";
 import { AppDispatch } from "../store";
 
 
 const initalState: IInitalState = {
     user: {
-        email: "",
-        password: "",
+        id : "",
+        username: "",
+        token: "",
+        email: ""
     },
     status: Status.IDLE,
     session: {
@@ -21,7 +22,7 @@ const authSlice = createSlice({
     name : "auth",
     initialState: initalState,
     reducers: {
-        setUser : ( state: IInitalState, action: PayloadAction<ILoginFormData> ) => {
+        setUser : ( state: IInitalState, action: PayloadAction<IRegisterData> ) => {
             state.user = action.payload;
         },
         setStatus : ( state: IInitalState, action: PayloadAction<Status> ) => {
@@ -38,14 +39,19 @@ export default authSlice.reducer;
 export { setUser, setStatus, setSession };
 
 // Function to register user
-function registerUser(formData: IRegisterData) {
+function registerUser(formData: IFormData) {
     return async (dispatch: AppDispatch) => {
         dispatch(setStatus(Status.LOADING));
         try {
             const response = await api.post("/auth/register", formData)
             //console.log("Response from register:", response.data.user);
             if (response.status === 201) {
-                dispatch(setUser(response.data.user))
+                dispatch(setUser({
+                    id: response.data.user.id,
+                    username: response.data.user.username,
+                    token: response.data.token,
+                    email: response.data.user.email,
+                }))
                 dispatch(setStatus(Status.SUCCESS))
             } else {
                 dispatch(setStatus(Status.ERROR));
@@ -57,7 +63,7 @@ function registerUser(formData: IRegisterData) {
 }
 
 // function to login user
-function loginUser(formData: ILoginFormData) {
+function loginUser(formData: IFormData) {
     return async (dispatch: AppDispatch) => {
 
         try {

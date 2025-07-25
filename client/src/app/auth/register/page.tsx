@@ -18,13 +18,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { registerUser } from "@/lib/store/auth/authSlice";
-import { IRegisterData } from "@/lib/store/auth/authTypes";
+import { IFormData } from "@/lib/store/auth/authTypes";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { Status } from "@/lib/types/type";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState<IRegisterData>({
+  const [formData, setFormData] = useState<IFormData>({
     username: "",
     email: "",
     password: "",

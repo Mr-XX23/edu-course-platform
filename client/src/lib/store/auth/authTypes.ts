@@ -1,12 +1,19 @@
 import { Status } from "@/lib/types/type";
 
+export interface IFormData {
+    username?: string;
+    email: string;
+    password: string;
+}
+
 export interface ILoginFormData {
-    email?: string;
-    password?: string;
+    id: string;
+    username: string;
+    token: string;
 }
 
 export interface IRegisterData extends ILoginFormData {
-    username?: string;
+    email?: string;
 }
 
 export interface IInitalState {

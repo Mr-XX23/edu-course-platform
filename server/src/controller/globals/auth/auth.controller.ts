@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../../database/models/user.models";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import { envConfig } from "../../../../config/config";
 import generateJwtToken from "../../../services/generateJwtToken";
 
@@ -34,16 +33,21 @@ export const registerUser = async (req: Request, res: Response) => {
   })
     .then((user) => {
       const token = generateJwtToken({
-        id : user.id
+        id: user.id
       })
       const { id, username, email } = user;
-      if ( token.length > 0 ) {
+      if (token.length > 0) {
+        res.cookie("sys_data", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+          sameSite: 'lax',
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
         res.status(201).json({
           success: true,
           message: "User registered successfully",
-          token : token,
           user: {
-            id,
             username,
             email
           },
@@ -90,9 +94,22 @@ export const loginUser = async (req: Request, res: Response) => {
       const token = generateJwtToken({
         id: data[0].id,
       });
+
+      res.cookie("sys_data", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/'
+      });
+
       res.json({
-        token: token,
+        success: true,
         message: "Login Successful",
+        user: {
+          username: data[0].username,
+          email: data[0].email,
+        },
       });
     } else {
       res.status(403).json({
@@ -102,3 +119,29 @@ export const loginUser = async (req: Request, res: Response) => {
     return;
   }
 };
+
+export const logoutUser = async (req: Request, res: Response) => {
+  try {
+    // Clear the auth cookie
+    res.clearCookie('authToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/'
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Logged out successfully"
+    });
+    return;
+
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+    return;
+  }
+}

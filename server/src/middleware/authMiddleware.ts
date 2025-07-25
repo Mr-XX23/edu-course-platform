@@ -9,7 +9,8 @@ import { IExtendedRequest } from './authType';
 const isLoggedIn = (req: IExtendedRequest, res: Response, next: NextFunction) => {
 
     try {
-        const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+        //const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+         const token = req.cookies.authToken;
 
         // If the token is not provided, return an error response
         if (!token) {
@@ -17,12 +18,11 @@ const isLoggedIn = (req: IExtendedRequest, res: Response, next: NextFunction) =>
                 success: false,
                 message: "Unauthorized access. No token provided."
             });
-
             return; 
         }
 
         // Verify the token
-        jwt.verify(token, envConfig.jwtSecret as string, async (error, result: any) => {
+        jwt.verify(token, envConfig.jwtSecret as string, async (error: any, result: any) => {
             if (error) {
                 res.status(403).json({
                     success: false,

@@ -10,11 +10,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/store/auth/authSlice";
+import { IFormData } from "@/lib/store/auth/authTypes";
 import { Status } from "@/lib/types/type";
-import { useAppSelector } from "@/lib/store/hooks";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { status, user, session } = useAppSelector((store) => store.auth);
 
   // Watch for authentication status changes
@@ -33,7 +35,7 @@ export default function LoginPage() {
     }
   }, [status, session?.loggedIn, router]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IFormData>({
     email: "",
     password: "",
   });
@@ -69,9 +71,9 @@ export default function LoginPage() {
   const handleLoginSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Dispatch login action
-    loginUser(formData);
-    
-    if ( status === Status.SUCCESS ) {
+    dispatch(loginUser(formData));
+
+    if (status === Status.SUCCESS) {
       alert("Login successful! Welcome back, " + user.email);
     } else if ( status === Status.ERROR ) {
       alert("Login failed. Please check your credentials and try again.");
