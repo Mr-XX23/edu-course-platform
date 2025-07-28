@@ -22,7 +22,7 @@ export default function LoginPage() {
   // Watch for authentication status changes
     useEffect(() => {
     if (session?.loggedIn) {
-      router.push("/");
+      router.push("/dashboard/institute");
     }
   }, [session?.loggedIn, router]);
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
     dispatch(loginUser(formData));
 
     if (status === Status.SUCCESS) {
-      router.push("/");
+      router.push("/dashboard");
     } else if ( status === Status.ERROR ) {
       alert("Login failed. Please check your credentials and try again.");
     }
