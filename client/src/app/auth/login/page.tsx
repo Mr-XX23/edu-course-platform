@@ -19,17 +19,10 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const { status, session } = useAppSelector((store) => store.auth);
 
-  // Watch for authentication status changes
-    useEffect(() => {
-    if (session?.loggedIn) {
-      router.push("/dashboard/institute");
-    }
-  }, [session?.loggedIn, router]);
-
   // Redirect if already logged in
     useEffect(() => {
     if (status === Status.SUCCESS && session?.loggedIn) {
-      router.push("/");
+      router.push("/dashboard");
     } else if (status === Status.ERROR) {
       alert("Login failed. Please check your credentials and try again.");
     }
@@ -72,12 +65,6 @@ export default function LoginPage() {
     e.preventDefault();
     // Dispatch login action
     dispatch(loginUser(formData));
-
-    if (status === Status.SUCCESS) {
-      router.push("/dashboard");
-    } else if ( status === Status.ERROR ) {
-      alert("Login failed. Please check your credentials and try again.");
-    }
   };
 
   return (

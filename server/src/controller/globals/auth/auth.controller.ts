@@ -62,7 +62,7 @@ export const registerUser = async (req: Request, res: Response) => {
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      expires: new Date(Date.now() + 1 * 60 * 1000), 
+      expires: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
       path: '/',
       sameSite: 'lax'
     });
@@ -70,7 +70,7 @@ export const registerUser = async (req: Request, res: Response) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      expires: new Date(Date.now() + 3 * 60 * 1000), 
+      expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
       path: '/',
       sameSite: 'lax'
     });
@@ -289,3 +289,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     });
   }
 }
+
+export const getCurrentUser = async (req: Request, res: Response) => {
+  
+};

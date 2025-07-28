@@ -6,7 +6,6 @@ import instituteStudentRouter from './routes/institute/student/instituteStudentR
 import categoryRouter from './routes/institute/category/categoryRoute';
 import instituteTeacherRouter from './routes/institute/teacher/instituteTeacherRoute';
 import teacherRoute from './routes/teacher/teacherRoute';
-import healthCheckRoute from './routes/globals/headlthcheck.route';
 import cors from 'cors';
 import { envConfig } from '../config/config';
 import cookieParser from "cookie-parser";
@@ -31,7 +30,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/api/v1/health", healthCheckRoute);
 // Global authentication routes
 app.use("/api/v1/auth", authRoute);
 

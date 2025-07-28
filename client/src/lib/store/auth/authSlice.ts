@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IInitalState,IFormData, IRegisterData } from "./authTypes";
 import { Status } from "@/lib/types/type";
-import { api } from "@/lib/https";
+import api from "@/lib/https";
 import { AppDispatch } from "../store";
 
 
@@ -66,7 +66,6 @@ function loginUser(formData: IFormData) {
 
         try {
             const response = await api.post("/auth/login", formData);
-            console.log("Response from login:", response.data.user);
             if (response.status === 200) {
                 dispatch(setUser(response.data.user));
                 dispatch(setStatus(Status.SUCCESS));

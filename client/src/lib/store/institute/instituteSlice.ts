@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IInstituteInitialState, IInstitute } from "./instituteTypes";
 import { Status } from "@/lib/types/type";
 import { AppDispatch } from "../store";
-import { api } from "@/lib/https";
+import api from "@/lib/https";
 
 const initalState: IInstituteInitialState = {
   institute: {

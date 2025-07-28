@@ -17,7 +17,7 @@ const generateJwtToken = (dataToEncrypt: TokenData) => {
     },
     envConfig.jwtAccessSecret as string,
     {
-      expiresIn: "1m",
+      expiresIn: "30m",
     }
   );
 
@@ -29,7 +29,7 @@ const generateJwtToken = (dataToEncrypt: TokenData) => {
     },
     envConfig.jwtRefreshSecret as string, 
     {
-      expiresIn: "5m",
+      expiresIn: "30d",
     }
   );
 

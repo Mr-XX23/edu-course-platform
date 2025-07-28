@@ -61,7 +61,7 @@ const isLoggedIn = async (req: IExtendedRequest, res: Response, next: NextFuncti
                 res.cookie("access_token", newAccessToken, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production',
-                    expires: new Date(Date.now() + 1 * 60 * 1000),
+                    expires: new Date(Date.now() + 30 * 60 * 1000),
                     path: '/',
                     sameSite: 'lax'
                 });

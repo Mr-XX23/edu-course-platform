@@ -2,17 +2,12 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAppSelector, useAppDispatch } from '@/lib/store/hooks';
-import { checkAuthSession } from '@/lib/store/auth/authSlice';
+import { useAppSelector } from '@/lib/store/hooks';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const dispatch = useAppDispatch();
   const { user, session } = useAppSelector((state) => state.auth);
 
-  useEffect(() => {
-    dispatch(checkAuthSession());
-  }, [dispatch]);
 
   useEffect(() => {
     if (!session?.loggedIn) {
