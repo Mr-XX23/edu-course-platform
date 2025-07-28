@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IInitalState,IFormData, IRegisterData } from "./authTypes";
 import { Status } from "@/lib/types/type";
-import api from "@/lib/https";
+import { api } from "@/lib/https";
 import { AppDispatch } from "../store";
 
 
@@ -42,7 +42,7 @@ function registerUser(formData: IFormData) {
     return async (dispatch: AppDispatch) => {
         dispatch(setStatus(Status.LOADING));
         try {
-            const response = await api.post("/auth/register", formData)
+            const response = await api.post("/auth/register", formData,)
             //console.log("Response from register:", response.data.user);
             if (response.status === 201) {
                 dispatch(setUser({
@@ -65,10 +65,12 @@ function loginUser(formData: IFormData) {
     return async (dispatch: AppDispatch) => {
 
         try {
-            const response = await api.post("api/v1/auth/login", formData);
+            const response = await api.post("/auth/login", formData);
+            console.log("Response from login:", response.data.user);
             if (response.status === 200) {
-                dispatch(setUser(response.data));
+                dispatch(setUser(response.data.user));
                 dispatch(setStatus(Status.SUCCESS));
+                dispatch(setSession(true));
             } else {
                 dispatch(setStatus(Status.ERROR));
             }
@@ -79,4 +81,37 @@ function loginUser(formData: IFormData) {
     }
 }
 
-export { registerUser, loginUser };
+// Function to refresh token
+function refreshToken() {
+    return async (dispatch: AppDispatch) => {
+        try {
+            const response = await api.post("/auth/refresh");
+            if (response.status === 200) {
+                // Token refreshed successfully, user remains logged in
+                dispatch(setSession(true));
+            } else {
+                dispatch(setSession(false));
+                dispatch(setStatus(Status.ERROR));
+            }
+        } catch (error) {
+            console.error("Error refreshing token:", error);
+            dispatch(setSession(false));
+            dispatch(setStatus(Status.ERROR));
+        }
+    }
+}
+
+// Function to logout user
+function logoutUser() {
+    return async (dispatch: AppDispatch) => {
+        try {
+            await api.post("/auth/logout");
+            dispatch(setUser({ id: "", username: "", email: "" }));
+            dispatch(setSession(false));
+            dispatch(setStatus(Status.SUCCESS));
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
+}
+export { registerUser, loginUser, refreshToken, logoutUser };

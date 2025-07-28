@@ -3,10 +3,20 @@ import { getApiUrl } from "../../../config";
 
 const api = axios.create({
     baseURL: getApiUrl(),
+    withCredentials: true,
     headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
     },
 })
 
-export default api; 
+const apiwithAuth = axios.create({
+    baseURL: getApiUrl(),
+    withCredentials: true, 
+    headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    },
+});
+
+export { api, apiwithAuth }; 

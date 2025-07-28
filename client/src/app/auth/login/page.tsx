@@ -17,7 +17,7 @@ import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { status, user, session } = useAppSelector((store) => store.auth);
+  const { status, session } = useAppSelector((store) => store.auth);
 
   // Watch for authentication status changes
     useEffect(() => {
@@ -74,13 +74,11 @@ export default function LoginPage() {
     dispatch(loginUser(formData));
 
     if (status === Status.SUCCESS) {
-      alert("Login successful! Welcome back, " + user.email);
+      router.push("/");
     } else if ( status === Status.ERROR ) {
       alert("Login failed. Please check your credentials and try again.");
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">

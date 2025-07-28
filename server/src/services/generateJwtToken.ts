@@ -1,20 +1,39 @@
 import jwt from "jsonwebtoken";
 import { envConfig } from "../../config/config";
 
-const generateJwtToken = (dataToEncrypt: {
+interface TokenData {
   id: string;
-  instituteID?: string;
-}) => {
-  const token = jwt.sign(
+  instituteID?: string | number | null;
+}
+
+const generateJwtToken = (dataToEncrypt: TokenData) => {
+
+  // Generate access token (short-lived)
+  const accessToken = jwt.sign(
     {
-      id: dataToEncrypt,
+      id: dataToEncrypt.id,
+      instituteID: dataToEncrypt.instituteID || null,
+      type: "access",
     },
-    envConfig.jwtSecret as string,
+    envConfig.jwtAccessSecret as string,
     {
-      expiresIn: "30d",
+      expiresIn: "1m",
     }
   );
-  return token;
+
+  // Generate refresh token (long-lived)
+  const refreshToken = jwt.sign({
+      id: dataToEncrypt.id,
+      instituteID: dataToEncrypt.instituteID || null,
+      type: 'refresh'
+    },
+    envConfig.jwtRefreshSecret as string, 
+    {
+      expiresIn: "5m",
+    }
+  );
+
+  return { accessToken, refreshToken };
 };
 
 export default generateJwtToken;
