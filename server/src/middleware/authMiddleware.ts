@@ -85,7 +85,7 @@ const isLoggedIn = async (req: IExtendedRequest, res: Response, next: NextFuncti
             if (error) {
                 res.status(403).json({
                     success: false,
-                    message: "Invalid access token."
+                    message: "Invalid access token. Please log in again."
                 });
                 return;
             }

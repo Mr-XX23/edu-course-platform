@@ -64,7 +64,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (status === Status.SUCCESS) {
-      router.push("/");
+      router.push("/dashboard/institute");
     } else if (status === Status.ERROR) {
       alert("Registration failed. Please try again.");
     }
